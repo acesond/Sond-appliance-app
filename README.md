@@ -11,7 +11,7 @@
 ```js
 const CONFIG = {
   kakaoOpenChatUrl: "https://open.kakao.com/o/XXXXXXXX",  // ← 실제 오픈카톡방 링크로 교체
-  threadsUrl: "https://www.threads.com/@sond__b",
+  threadsUrl: "https://www.threads.com/@everyday_hotdeal",
   blogUrl: "https://blog.naver.com/lgbestshopson",
   ...
 };
