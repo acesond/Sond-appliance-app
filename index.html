@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>가전 매니저 10년차의 혼수·이사 체감가 계산기</title>
+<meta name="description" content="TV·냉장고·워시타워·에어컨 등 혼수·이사 가전을 조합하면 다품목 동시구매 할인, 제휴카드 청구할인, 상품권·포인트까지 단계별로 계산해 최종 체감가와 정상가 대비 절약률을 보여주는 무료 계산기.">
+<meta name="theme-color" content="#0b1b2f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="가전 체감가 계산기">
+<meta name="application-name" content="가전 체감가 계산기">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1b2f'/%3E%3Cpath d='M7 22l6-7 4 3.5L25 9' stroke='%2310b981' stroke-width='2.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#0b1524; --ink2:#22334a; --dim:#5c6b80; --dim2:#8a97a9;
+  --bg:#f3f6f8; --card:#ffffff; --line:#e3e9ee; --line2:#eef2f6;
+  --em:#0e9f6e; --em-d:#0a7f57; --em-soft:#e7f7f0; --em-line:#b9e6d3;
+  --navy:#0b1b2f; --navy2:#132c4d; --gold:#c9a04a;
+  --r:18px; --r2:14px;
+  --sh:0 1px 2px rgba(11,21,36,.04), 0 10px 26px -16px rgba(11,21,36,.28);
+  --sh2:0 1px 2px rgba(11,21,36,.05);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+html{background:var(--bg); -webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(900px 380px at 50% -200px, rgba(14,159,110,.10), transparent 70%),
+    var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"Liberation Sans","Apple SD Gothic Neo","Pretendard","Noto Sans KR",Roboto,"Malgun Gothic",sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  word-break:keep-all; overflow-wrap:anywhere;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+.num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1}
+.wrap{max-width:820px; margin:0 auto; padding:0 16px}
+
+/* ── header ───────────────────────────── */
+.hdr{
+  position:sticky; top:0; z-index:40;
+  background:rgba(255,255,255,.86);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.hdr-in{display:flex; align-items:center; gap:10px; height:58px}
+.brand{display:flex; align-items:center; gap:9px; min-width:0}
+.logo{
+  width:32px; height:32px; border-radius:10px; flex:0 0 auto;
+  background:linear-gradient(150deg,var(--navy2),var(--navy));
+  color:#fff; display:grid; place-items:center; font-size:15px; font-weight:800;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.brand b{display:block; font-size:13.5px; letter-spacing:-.2px; line-height:1.25; font-weight:760}
+.brand small{display:block; font-size:10.5px; color:var(--dim2); line-height:1.3; margin-top:1px; letter-spacing:-.1px}
+.hdr-cta{
+  margin-left:auto; flex:0 0 auto; text-decoration:none;
+  background:var(--em); color:#fff; font-size:12px; font-weight:700;
+  padding:8px 12px; border-radius:10px; letter-spacing:-.2px;
+  box-shadow:0 6px 14px -8px rgba(14,159,110,.9);
+}
+
+/* ── hero ─────────────────────────────── */
+.hero{
+  margin:14px 0 0; border-radius:22px; overflow:hidden; position:relative;
+  background:linear-gradient(160deg,#0d2140 0%, #0b1b2f 46%, #0a1729 100%);
+  color:#eef4fa; padding:20px 18px 16px;
+  box-shadow:0 18px 40px -24px rgba(9,20,34,.85);
+}
+.hero::before{
+  content:""; position:absolute; inset:auto -30% -60% -30%; height:220px;
+  background:radial-gradient(closest-side, rgba(16,185,129,.30), transparent 75%);
+  pointer-events:none;
+}
+.hero > *{position:relative}
+.hero-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:10.5px; font-weight:700; letter-spacing:.2px;
+  color:#8ff0c8; background:rgba(16,185,129,.13);
+  border:1px solid rgba(16,185,129,.32); border-radius:999px; padding:4px 9px;
+}
+.hero h1{
+  margin:11px 0 3px; font-size:19px; line-height:1.32; letter-spacing:-.6px; font-weight:800;
+}
+.hero h1 em{font-style:normal; color:#5ce0ab}
+.hero p.lead{margin:0; font-size:11.5px; color:#9fb2c9; letter-spacing:-.2px}
+.hero-main{display:flex; align-items:flex-end; gap:12px; margin-top:16px; flex-wrap:wrap}
+.hero-main .big{flex:1 1 190px; min-width:0}
+.hero-lab{font-size:11px; color:#9fb2c9; letter-spacing:-.1px; display:flex; align-items:center; gap:5px}
+.hero-lab i{width:5px; height:5px; border-radius:50%; background:#10b981; display:inline-block}
+.hero-amt{font-size:34px; font-weight:820; letter-spacing:-1.6px; line-height:1.12; margin-top:2px; color:#fff}
+.hero-amt .won{font-size:17px; font-weight:700; letter-spacing:-.4px; margin-left:2px; color:#cfe0f0}
+.hero-save{
+  flex:0 0 auto; text-align:right; background:rgba(16,185,129,.12);
+  border:1px solid rgba(16,185,129,.28); border-radius:12px; padding:7px 11px;
+}
+.hero-save b{display:block; font-size:16px; color:#5ce0ab; letter-spacing:-.5px; font-weight:800; line-height:1.2}
+.hero-save span{font-size:10px; color:#9fb2c9; letter-spacing:-.1px}
+.hero-meter{margin-top:14px; height:7px; border-radius:99px; background:rgba(255,255,255,.10); overflow:hidden; display:flex}
+.hero-meter i{display:block; height:100%}
+.hero-meter .m1{background:#2f6fd0}
+.hero-meter .m2{background:#14b8a6}
+.hero-meter .m3{background:#8fe3c2}
+.hero-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:14px;
+  background:rgba(255,255,255,.09); border-radius:12px; overflow:hidden}
+.hero-stats div{background:rgba(9,21,36,.55); padding:9px 9px 10px}
+.hero-stats span{display:block; font-size:9.5px; color:#8ea3bb; letter-spacing:-.1px}
+.hero-stats strong{display:block; font-size:13px; margin-top:3px; color:#e8f1fa; letter-spacing:-.5px; font-weight:750}
+
+/* ── section ──────────────────────────── */
+.sec{margin-top:22px; scroll-margin-top:70px}
+.sec-head{display:flex; align-items:center; gap:8px; margin:0 0 10px}
+.sec-no{
+  width:22px; height:22px; border-radius:7px; flex:0 0 auto;
+  background:var(--navy); color:#fff; font-size:11px; font-weight:800;
+  display:grid; place-items:center;
+}
+.sec-head h2{margin:0; font-size:15px; letter-spacing:-.5px; font-weight:800}
+.sec-head .hint{margin-left:auto; font-size:10.5px; color:var(--dim2); letter-spacing:-.2px; white-space:nowrap}
+.sec-desc{margin:-4px 0 12px; font-size:11.5px; color:var(--dim); letter-spacing:-.2px; padding-left:30px}
+
+/* presets */
+.presets{display:flex; gap:7px; overflow-x:auto; padding:0 0 2px; margin:0 -16px 10px; padding-left:16px; padding-right:16px; scrollbar-width:none}
+.presets::-webkit-scrollbar{display:none}
+.presets button{
+  flex:0 0 auto; font:inherit; font-size:11px; font-weight:650; letter-spacing:-.2px;
+  padding:7px 11px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--line); background:#fff; color:var(--ink2);
+}
+.presets button.on{background:var(--navy); border-color:var(--navy); color:#fff}
+.presets button.ghost{color:var(--dim); background:transparent}
+
+/* item grid */
+.grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px}
+.item{
+  position:relative; background:var(--card); border:1px solid var(--line);
+  border-radius:var(--r2); padding:11px 11px 12px; cursor:pointer;
+  transition:border-color .16s, box-shadow .16s, background .16s, transform .12s;
+  box-shadow:var(--sh2);
+}
+.item:active{transform:scale(.995)}
+.item.sel{border-color:var(--em); background:linear-gradient(180deg,#f4fdf9,#fff); box-shadow:0 0 0 2px rgba(14,159,110,.12), var(--sh2)}
+.item .ico{
+  width:30px; height:30px; border-radius:9px; display:grid; place-items:center;
+  background:#f2f5f8; font-size:16px; line-height:1;
+}
+.item.sel .ico{background:var(--em-soft)}
+.item .pick{
+  position:absolute; top:11px; right:11px; width:20px; height:20px; border-radius:50%;
+  border:1.5px solid var(--line); color:var(--dim2); font-size:13px; font-weight:700;
+  display:grid; place-items:center; line-height:1; background:#fff;
+}
+.item.sel .pick{background:var(--em); border-color:var(--em); color:#fff; font-size:12px}
+.item h3{margin:8px 0 1px; font-size:12.5px; letter-spacing:-.4px; font-weight:780}
+.item .sub{margin:0; font-size:10px; color:var(--dim2); letter-spacing:-.2px; line-height:1.35; min-height:26px}
+.item .pbox{margin-top:6px; display:flex; flex-direction:column; gap:1px}
+.item .plist{font-size:9.5px; color:var(--dim2); text-decoration:line-through}
+.item .pnow{font-size:13px; font-weight:800; letter-spacing:-.6px; color:var(--em-d)}
+.item .pnone{font-size:11px; color:var(--dim); letter-spacing:-.2px}
+.item .tiers{display:none; gap:3px; margin-top:8px}
+.item.sel .tiers{display:flex}
+.item .tiers button{
+  flex:1 1 0; min-width:0; font:inherit; font-size:10px; font-weight:650; letter-spacing:-.3px;
+  padding:4px 2px; border-radius:7px; border:1px solid var(--line);
+  background:#fff; color:var(--dim); cursor:pointer; white-space:nowrap;
+}
+.item .tiers button.on{background:var(--em); border-color:var(--em); color:#fff}
+.item .cwrap{display:none; align-items:center; gap:3px; margin-top:6px}
+.item.sel .cwrap.show{display:flex}
+.item .cwrap input{
+  width:100%; min-width:0; font:inherit; font-size:11.5px; letter-spacing:-.3px;
+  padding:5px 7px; border-radius:7px; border:1px solid var(--em-line); background:#fff; color:var(--ink);
+}
+.item .cwrap input:focus{outline:none; border-color:var(--em); box-shadow:0 0 0 2px rgba(14,159,110,.15)}
+.item .cwrap span{font-size:10.5px; color:var(--dim)}
+.item .badge7{
+  position:absolute; left:11px; bottom:11px; font-size:9px; font-weight:700;
+  color:var(--em-d); background:var(--em-soft); border-radius:6px; padding:2px 5px;
+}
+
+/* savings bar */
+.bundle-note{
+  margin-top:10px; display:flex; align-items:center; gap:8px;
+  background:#fff; border:1px dashed var(--em-line); border-radius:12px; padding:9px 11px;
+  font-size:11px; color:var(--ink2); letter-spacing:-.2px; line-height:1.4;
+}
+.bundle-note b{color:var(--em-d)}
+.bundle-note .lvl{margin-left:auto; font-size:10px; color:var(--dim2); white-space:nowrap}
+
+/* benefits */
+.panel{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:13px 13px 14px; box-shadow:var(--sh2)}
+.brow + .brow{margin-top:13px; padding-top:13px; border-top:1px solid var(--line2)}
+.blab{display:flex; align-items:center; gap:6px; font-size:12px; font-weight:720; letter-spacing:-.35px; margin-bottom:7px}
+.blab span.tag{font-size:9.5px; font-weight:700; color:var(--dim); background:#f2f5f8; border-radius:5px; padding:2px 5px; letter-spacing:0}
+.blab em{margin-left:auto; font-style:normal; font-size:10.5px; color:var(--em-d); font-weight:700; letter-spacing:-.2px}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chips button{
+  font:inherit; font-size:11px; font-weight:650; letter-spacing:-.3px; cursor:pointer;
+  padding:7px 10px; border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--ink2);
+}
+.chips button.on{background:var(--navy); border-color:var(--navy); color:#fff}
+.chips button small{display:block; font-size:9px; font-weight:600; opacity:.7; margin-top:1px; letter-spacing:-.1px}
+.switch-row{display:flex; align-items:center; gap:10px; font-size:11.5px; color:var(--ink2); letter-spacing:-.2px}
+.switch{margin-left:auto; flex:0 0 auto; width:44px; height:25px; border-radius:99px; border:none; background:#dfe6ec; position:relative; cursor:pointer; transition:background .18s}
+.switch i{position:absolute; top:3px; left:3px; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .18s; box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--em)}
+.switch.on i{left:22px}
+
+/* breakdown */
+.bd{padding:8px 13px 0}
+.bdrow{display:flex; align-items:flex-start; gap:10px; padding:9px 0}
+.bdrow + .bdrow{border-top:1px solid var(--line2)}
+.bdrow .l{flex:1 1 auto; min-width:0}
+.bdrow .l b{display:block; font-size:12px; font-weight:700; letter-spacing:-.35px}
+.bdrow .l span{display:block; font-size:10px; color:var(--dim2); letter-spacing:-.2px; margin-top:1px; line-height:1.35}
+.bdrow .v{flex:0 0 auto; font-size:12.5px; font-weight:750; letter-spacing:-.4px; white-space:nowrap; padding-top:1px}
+.bdrow .v.neg{color:var(--em-d)}
+.bdrow .v.pos{color:var(--ink)}
+.bdrow.total{background:#f7fafc; margin:2px -13px; padding:11px 13px; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.bdrow.total .l b{font-size:12.5px}
+.bdrow.total .v{font-size:15px}
+.bdrow.final{background:var(--em-soft); margin:0 -13px 0; padding:12px 13px; border-radius:0 0 var(--r) var(--r)}
+.bdrow.final .l b{font-size:13px}
+.bdrow.final .v{font-size:18px; color:var(--em-d)}
+.bar{height:4px; border-radius:99px; background:#edf1f5; margin-top:6px; overflow:hidden}
+.bar i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#5fd4a5,#0e9f6e)}
+.bar.b2 i{background:linear-gradient(90deg,#7ba9e6,#2f6fd0)}
+
+/* compare */
+.cmp{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+.cmp .c{
+  background:#fff; border:1px solid var(--line); border-radius:var(--r2); padding:12px; position:relative;
+  box-shadow:var(--sh2);
+}
+.cmp .c.win{border-color:var(--em); box-shadow:0 0 0 2px rgba(14,159,110,.12)}
+.cmp .c h4{margin:0 0 2px; font-size:11.5px; letter-spacing:-.4px; font-weight:780; color:var(--ink2)}
+.cmp .c .who{font-size:9.5px; color:var(--dim2); letter-spacing:-.2px; min-height:13px}
+.cmp .c .amt{font-size:20px; font-weight:820; letter-spacing:-1px; margin-top:7px; line-height:1.15}
+.cmp .c.win .amt{color:var(--em-d)}
+.cmp .c ul{list-style:none; margin:9px 0 0; padding:0}
+.cmp .c li{font-size:10px; color:var(--dim); letter-spacing:-.2px; line-height:1.45; padding:2px 0 2px 11px; position:relative}
+.cmp .c li::before{content:""; position:absolute; left:1px; top:8px; width:4px; height:4px; border-radius:50%; background:#c3cdd8}
+.cmp .c.win li::before{background:var(--em)}
+.cmp .c li b{color:var(--ink2); font-weight:700}
+.cmp .flag{position:absolute; top:-8px; right:10px; font-size:9px; font-weight:800; color:#fff; background:var(--em); border-radius:6px; padding:2px 7px; letter-spacing:-.1px}
+.verdict{
+  margin-top:9px; border-radius:12px; padding:11px 12px;
+  background:linear-gradient(135deg,#0b1b2f,#132c4d); color:#eaf2fa;
+  display:flex; gap:9px; align-items:flex-start;
+}
+.verdict .vs{flex:0 0 auto; font-size:18px; line-height:1}
+.verdict p{margin:0; font-size:11px; line-height:1.5; letter-spacing:-.2px; color:#c8d7e8}
+.verdict p b{color:#5ce0ab; font-weight:800; font-size:12.5px}
+.reasons{display:flex; gap:5px; flex-wrap:wrap; margin-top:8px}
+.reasons span{font-size:9.5px; color:#9fb2c9; border:1px solid rgba(255,255,255,.16); border-radius:6px; padding:2px 6px; letter-spacing:-.1px}
+
+/* quote */
+.form{display:grid; gap:9px}
+.field{display:grid; gap:4px}
+.field label{font-size:10.5px; color:var(--dim); font-weight:650; letter-spacing:-.2px}
+.field input,.field select{
+  font:inherit; font-size:12.5px; letter-spacing:-.3px; color:var(--ink);
+  padding:10px 11px; border-radius:10px; border:1px solid var(--line); background:#fff; width:100%;
+}
+.field input:focus,.field select:focus{outline:none; border-color:var(--em); box-shadow:0 0 0 3px rgba(14,159,110,.13)}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+.btns{display:grid; gap:7px; margin-top:11px}
+.btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  font:inherit; font-size:13px; font-weight:750; letter-spacing:-.4px; line-height:1.32; text-align:center;
+  padding:11px 14px; border-radius:12px; border:1px solid transparent; cursor:pointer; text-decoration:none;
+}
+.btn.primary{background:var(--em); color:#fff; box-shadow:0 10px 22px -12px rgba(14,159,110,.9)}
+.btn.dark{background:var(--navy); color:#fff}
+.btn.line{background:#fff; border-color:var(--line); color:var(--ink2)}
+.btn small{display:block; font-size:9.5px; font-weight:600; opacity:.72; margin-top:1px; letter-spacing:-.1px}
+.fine{margin:10px 0 0; font-size:10px; color:var(--dim2); line-height:1.6; letter-spacing:-.2px}
+details.help{background:#fff; border:1px solid var(--line); border-radius:12px; padding:11px 12px; margin-top:16px}
+details.help summary{font-size:11.5px; font-weight:700; color:var(--ink2); cursor:pointer; letter-spacing:-.3px; list-style:none}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary::after{content:"+"; float:right; color:var(--dim2); font-weight:700}
+details.help[open] summary::after{content:"–"}
+details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spacing:-.2px; margin-top:8px}
+
+/* footer */
+.ft{margin:22px 0 8px; text-align:center}
+.ft b{display:block; font-size:11px; color:var(--ink2); letter-spacing:-.3px}
+.ft span{display:block; font-size:10px; color:var(--dim2); margin-top:3px; letter-spacing:-.2px}
+
+/* sticky bottom */
+.dock{
+  position:fixed; left:0; right:0; bottom:0; z-index:50;
+  background:rgba(255,255,255,.94);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  backdrop-filter:saturate(180%) blur(14px);
+  border-top:1px solid var(--line);
+  padding:9px 16px calc(9px + env(safe-area-inset-bottom));
+}
+.dock-in{max-width:820px; margin:0 auto; display:flex; align-items:center; gap:10px}
+.dock .d1{min-width:0; flex:1 1 auto}
+.dock .d1 > span{display:block; font-size:9.5px; color:var(--dim2); letter-spacing:-.1px}
+.dock .d1 b{display:block; font-size:15.5px; font-weight:820; letter-spacing:-.8px; line-height:1.3; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.dock .d1 b em{font-style:normal; font-size:10px; font-weight:700; color:var(--em-d); margin-left:4px; letter-spacing:-.2px}
+.dock .go{
+  flex:0 0 auto; font:inherit; font-size:12.5px; font-weight:750; letter-spacing:-.3px;
+  padding:11px 15px; border-radius:11px; border:none; background:var(--em); color:#fff; cursor:pointer;
+  box-shadow:0 8px 18px -10px rgba(14,159,110,.95);
+}
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:calc(92px + env(safe-area-inset-bottom)); transform:translate(-50%,10px);
+  background:#0b1b2f; color:#fff; font-size:12px; font-weight:650; letter-spacing:-.2px;
+  padding:10px 16px; border-radius:11px; z-index:99; opacity:0; pointer-events:none;
+  transition:opacity .2s, transform .2s; box-shadow:0 14px 30px -14px rgba(0,0,0,.6); max-width:86vw; text-align:center;
+}
+.toast.show{opacity:1; transform:translate(-50%,0)}
+
+/* empty */
+.empty{padding:16px 4px; text-align:center; font-size:11.5px; color:var(--dim2); letter-spacing:-.2px}
+
+@media (min-width:640px){
+  .wrap{padding:0 24px}
+  .hero{padding:26px 26px 20px; border-radius:26px}
+  .hero h1{font-size:24px}
+  .hero-amt{font-size:42px}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cmp{gap:12px}
+  .cmp .c{padding:15px}
+  .cmp .c .amt{font-size:24px}
+  .presets{margin-left:0; margin-right:0; padding-left:0; padding-right:0}
+}
+@media (min-width:820px){
+  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  body{padding-bottom:110px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <div class="brand">
+      <span class="logo">가</span>
+      <div>
+        <b>가전 매니저 10년차</b>
+        <small>@sond__b · 혼수·이사 체감가 계산기</small>
+      </div>
+    </div>
+    <a class="hdr-cta" href="#quote">무료 견적</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" aria-label="체감가 요약">
+    <span class="hero-badge">✓ 설치비·폐가전·사은품까지 반영</span>
+    <h1>이 조합, <em>최종 얼마</em>인지<br>바로 나옵니다</h1>
+    <p class="lead">정상가 → 다품목 할인 → 카드 → 상품권까지, 실제 매장 상담 때 쓰는 계산 그대로.</p>
+
+    <div class="hero-main">
+      <div class="big">
+        <div class="hero-lab"><i></i> 예상 최종 체감가</div>
+        <div class="hero-amt num"><span id="hFinal">0</span><span class="won">원</span></div>
+      </div>
+      <div class="hero-save">
+        <b class="num" id="hPct">0% 절약</b>
+        <span class="num" id="hSave">0원 아끼는 중</span>
+      </div>
+    </div>
+
+    <div class="hero-meter" aria-hidden="true">
+      <i class="m1" id="barM1" style="width:0%"></i>
+      <i class="m2" id="barM2" style="width:0%"></i>
+      <i class="m3" id="barM3" style="width:0%"></i>
+    </div>
+
+    <div class="hero-stats">
+      <div><span>정상가 합계</span><strong class="num" id="hList">0원</strong></div>
+      <div><span>실결제 예정</span><strong class="num" id="hPay">0원</strong></div>
+      <div><span>선택 품목</span><strong class="num" id="hCount">0개</strong></div>
+    </div>
+  </section>
+
+  <!-- ① 품목 선택 -->
+  <section class="sec" id="pick">
+    <div class="sec-head">
+      <span class="sec-no">1</span>
+      <h2>품목 조합</h2>
+      <span class="hint">2개부터 다품목 할인</span>
+    </div>
+    <p class="sec-desc">살 품목을 누르고, 프리미엄 / 가성비 / 직접입력 중 고르세요.</p>
+
+    <div class="presets" id="presets" role="group" aria-label="빠른 조합">
+      <button data-preset="honsu">혼수 8품목</button>
+      <button data-preset="move">이사 5품목</button>
+      <button data-preset="value3">가성비 3품목</button>
+      <button data-preset="clear" class="ghost">초기화</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="bundle-note" id="bundleNote">
+      <span>🎁</span>
+      <span id="bundleText">품목을 2개 이상 선택하면 <b>다품목 동시구매 할인</b>이 자동으로 붙습니다.</span>
+      <span class="lvl" id="bundleLvl">0품목</span>
+    </div>
+  </section>
+
+  <!-- ② 혜택 설정 -->
+  <section class="sec" id="benefit">
+    <div class="sec-head">
+      <span class="sec-no">2</span>
+      <h2>결제 혜택</h2>
+      <span class="hint">카드·상품권 중복 확인</span>
+    </div>
+    <div class="panel">
+      <div class="brow">
+        <div class="blab">제휴카드 청구할인 <span class="tag">즉시</span><em id="cardNow">-</em></div>
+        <div class="chips" id="cardChips">
+          <button data-card="none">적용 안 함</button>
+          <button data-card="c5">5%<small>한도 50만</small></button>
+          <button data-card="c7">7%<small>한도 40만</small></button>
+          <button data-card="c10">10%<small>한도 30만</small></button>
+        </div>
+      </div>
+      <div class="brow">
+        <div class="blab">상품권 구매 할인 <span class="tag">체감</span><em id="gcNow">-</em></div>
+        <div class="chips" id="gcChips">
+          <button data-gc="0">없음</button>
+          <button data-gc="0.03">3%</button>
+          <button data-gc="0.05">5%</button>
+          <button data-gc="0.07">7%</button>
+        </div>
+      </div>
+      <div class="brow">
+        <div class="blab">포인트·사은품 체감 <span class="tag">실질</span><em id="giftNow">-</em></div>
+        <div class="switch-row">
+          <span>멤버십 1% + 사은품·무상설치·폐가전 수거 포함</span>
+          <button class="switch on" id="giftSw" aria-label="포인트·사은품 체감 포함" aria-pressed="true"><i></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 계산 상세 -->
+  <section class="sec" id="detail">
+    <div class="sec-head">
+      <span class="sec-no">3</span>
+      <h2>체감가 계산 상세</h2>
+      <span class="hint">단계별 자동 계산</span>
+    </div>
+    <div class="panel bd" id="bd"></div>
+  </section>
+
+  <!-- ④ 비교 -->
+  <section class="sec" id="compare">
+    <div class="sec-head">
+      <span class="sec-no">4</span>
+      <h2>온라인 단품 vs 다품목</h2>
+      <span class="hint">역전 포인트</span>
+    </div>
+    <p class="sec-desc">인터넷 최저가가 늘 정답은 아닙니다. 숨은 비용까지 넣어 비교했습니다.</p>
+    <div class="cmp" id="cmp"></div>
+    <div class="verdict">
+      <span class="vs">⚖️</span>
+      <div>
+        <p id="verdictText">품목을 선택하면 이번 조합에 유리한 쪽을 계산해 드립니다.</p>
+        <div class="reasons" id="verdictReasons"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 견적 신청 -->
+  <section class="sec" id="quote">
+    <div class="sec-head">
+      <span class="sec-no">5</span>
+      <h2>1:1 최저가 견적 요청</h2>
+      <span class="hint">무료 · 영업일 1일</span>
+    </div>
+    <div class="panel">
+      <div class="form">
+        <div class="two">
+          <div class="field">
+            <label for="fBudget">예산</label>
+            <select id="fBudget">
+              <option value="미정">미정</option>
+              <option value="800만원 이하">800만원 이하</option>
+              <option value="800~1,200만원">800~1,200만원</option>
+              <option value="1,200~1,600만원" selected>1,200~1,600만원</option>
+              <option value="1,600~2,000만원">1,600~2,000만원</option>
+              <option value="2,000만원 이상">2,000만원 이상</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fWhen">입주·결혼 시기</label>
+            <select id="fWhen">
+              <option value="">미정</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fRegion">설치 지역 (동까지)</label>
+          <input type="text" id="fRegion" placeholder="예: 대구 달서구 상인동" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="btn primary" id="copyBtn">📋 견적서 텍스트 복사 <small>상담에 그대로 붙여넣기</small></button>
+        <a class="btn dark" id="kakaoBtn" href="#" target="_blank" rel="noopener">💬 오픈카톡으로 상담하기</a>
+        <a class="btn line" id="threadsBtn" href="#" target="_blank" rel="noopener">🧵 스레드 @sond__b 보기</a>
+      </div>
+      <p class="fine">계산 금액은 공개 정상가와 일반적인 할인 구조를 기준으로 한 <b>예상치</b>입니다. 실제 시점·매장 재고·카드 조건·상품권 시세에 따라 달라지며, 확정 견적은 상담에서 안내드립니다.</p>
+    </div>
+
+    <details class="help">
+      <summary>계산 기준과 할인 구조가 궁금하시면</summary>
+      <div>
+        · 정상가는 각 브랜드 공개 출고가 기준입니다.<br>
+        · 기본 할인가는 매장·온라인에서 흔히 적용되는 품목별 할인율을 반영했습니다.<br>
+        · 다품목 동시구매 할인은 2품목 3% / 3품목 5% / 4품목 7% / 5품목 이상 9%로 계산합니다.<br>
+        · 제휴카드 청구할인은 월 할인한도가 있어 한도까지만 반영합니다.<br>
+        · 상품권 구매 할인은 상품권을 할인가에 미리 사서 결제할 때의 차액입니다.<br>
+        · 사은품·무상설치·폐가전 수거는 실제 결제액이 줄지는 않지만 실질 부담이 줄어드는 값으로 체감가에 넣었습니다.
+      </div>
+    </details>
+  </section>
+
+  <div class="ft">
+    <b>가전 매니저 10년차 · @sond__b</b>
+    <span>현장에서 쓰는 계산 그대로 · 무료 견적 상담</span>
+  </div>
+</main>
+
+<div class="dock">
+  <div class="dock-in">
+    <div class="d1">
+      <span>최종 체감가</span>
+      <b class="num"><span id="dFinal">0</span>원 <em id="dPct">0%</em></b>
+    </div>
+    <button class="go" id="dockGo">견적서 복사</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── 배포 전 여기만 바꾸면 됩니다 ───────────── */
+  const CONFIG = {
+    kakaoOpenChatUrl: "https://open.kakao.com/o/XXXXXXXX",
+    threadsUrl: "https://www.threads.com/@sond__b",
+    blogUrl: "https://blog.naver.com/lgbestshopson",
+    managerLabel: "가전 매니저 10년차",
+    pointRate: 0.01,
+    giftBase: 300000,
+    giftPerItem: 30000,
+    onlineFactor: 0.96,
+    acInstall: 250000,
+    haulPerBig: 40000
+  };
+
+  const CATALOG = [
+    { id:"tv", name:"TV", sub:"올레드 · QNED 65형", icon:"📺", big:true,
+      tiers:{ premium:{label:"프리미엄", model:"LG 올레드 evo 65", list:4290000, rate:0.80},
+              value:{label:"가성비", model:"LG QNED evo 65", list:1690000, rate:0.82} } },
+    { id:"fridge", name:"냉장고", sub:"양문형 700~870L", icon:"🧊", big:true,
+      tiers:{ premium:{label:"프리미엄", model:"디오스 오브제 870L", list:4190000, rate:0.78},
+              value:{label:"가성비", model:"디오스 700L", list:1890000, rate:0.80} } },
+    { id:"wash", name:"세탁·건조", sub:"워시타워 / 분리형", icon:"🧺", big:true,
+      tiers:{ premium:{label:"프리미엄", model:"트롬 오브제 워시타워", list:4190000, rate:0.78},
+              value:{label:"가성비", model:"세탁 24kg + 건조 분리형", list:2590000, rate:0.80} } },
+    { id:"air", name:"에어컨", sub:"스탠드 + 벽걸이", icon:"❄️", big:true,
+      tiers:{ premium:{label:"프리미엄", model:"휘센 2in1 멀티", list:3890000, rate:0.80},
+              value:{label:"가성비", model:"휘센 스탠드 17형", list:2190000, rate:0.82} } },
+    { id:"dish", name:"식기세척기", sub:"12~14인용", icon:"🍽️", big:false,
+      tiers:{ premium:{label:"프리미엄", model:"디오스 14인용", list:1590000, rate:0.80},
+              value:{label:"가성비", model:"디오스 12인용", list:890000, rate:0.82} } },
+    { id:"robot", name:"로봇청소기", sub:"물걸레 겸용", icon:"🤖", big:false,
+      tiers:{ premium:{label:"프리미엄", model:"로보킹 AI 올인원", list:1890000, rate:0.80},
+              value:{label:"가성비", model:"코드제로 R5", list:690000, rate:0.82} } },
+    { id:"airpur", name:"공기청정기", sub:"360° 순환형", icon:"🌬️", big:false,
+      tiers:{ premium:{label:"프리미엄", model:"퓨리케어 360 히팅", list:1290000, rate:0.80},
+              value:{label:"가성비", model:"퓨리케어 360 슬림", list:590000, rate:0.82} } },
+    { id:"induction", name:"인덕션", sub:"3구 / 2구", icon:"🔥", big:false,
+      tiers:{ premium:{label:"프리미엄", model:"디오스 3구 인덕션", list:1490000, rate:0.80},
+              value:{label:"가성비", model:"디오스 2구 하이라이트", list:690000, rate:0.82} } },
+    { id:"vacuum", name:"무선청소기", sub:"스틱형", icon:"🧹", big:false,
+      tiers:{ premium:{label:"프리미엄", model:"코드제로 A9S 올인원", list:1090000, rate:0.80},
+              value:{label:"가성비", model:"코드제로 A9 라이트", list:490000, rate:0.82} } }
+  ];
+
+  const BUNDLE = [
+    { min:5, rate:0.09, label:"5품목 이상 · 9%" },
+    { min:4, rate:0.07, label:"4품목 · 7%" },
+    { min:3, rate:0.05, label:"3품목 · 5%" },
+    { min:2, rate:0.03, label:"2품목 · 3%" }
+  ];
+
+  const CARDS = {
+    none:{ rate:0, cap:0, label:"적용 안 함" },
+    c5:{ rate:0.05, cap:500000, label:"청구할인 5%" },
+    c7:{ rate:0.07, cap:400000, label:"청구할인 7%" },
+    c10:{ rate:0.10, cap:300000, label:"청구할인 10%" }
+  };
+
+  const STATE = {
+    sel:{},
+    card:"c5",
+    gc:0.05,
+    gifts:true
+  };
+
+  const PRESETS = {
+    honsu:{ tv:"premium", fridge:"premium", wash:"premium", air:"premium", dish:"premium", robot:"premium", airpur:"premium", induction:"premium" },
+    move:{ tv:"premium", fridge:"premium", wash:"premium", air:"value", dish:"value" },
+    value3:{ tv:"value", fridge:"value", wash:"value" }
+  };
+
+  const $ = function(id){ return document.getElementById(id); };
+  const r10 = function(n){ return Math.round(n/10)*10; };
+  const fmt = function(n){ return Math.round(n).toLocaleString("ko-KR"); };
+  const won = function(n){ return fmt(n) + "원"; };
+  const shortWon = function(n){
+    if(Math.abs(n) >= 100000000) return (n/100000000).toFixed(1).replace(/\.0$/,"") + "억";
+    if(Math.abs(n) >= 10000){
+      const man = n/10000;
+      const str = Math.abs(n) >= 1000000 ? Math.round(man).toLocaleString("ko-KR") : man.toFixed(1).replace(/\.0$/,"");
+      return str + "만";
+    }
+    return fmt(n);
+  };
+
+  /* ── 카탈로그 렌더 ─────────────────────── */
+  function buildGrid(){
+    const grid = $("grid");
+    grid.innerHTML = CATALOG.map(function(it){
+      return '<article class="item" data-id="' + it.id + '" role="button" tabindex="0" aria-pressed="false">' +
+        '<span class="ico">' + it.icon + '</span>' +
+        '<span class="pick">+</span>' +
+        '<h3>' + it.name + '</h3>' +
+        '<p class="sub">' + it.sub + '</p>' +
+        '<div class="pbox">' +
+          '<span class="plist" data-role="list"></span>' +
+          '<span class="pnow" data-role="now"></span>' +
+        '</div>' +
+        '<div class="tiers">' +
+          '<button type="button" data-tier="premium">프리미엄</button>' +
+          '<button type="button" data-tier="value">가성비</button>' +
+          '<button type="button" data-tier="custom">직접</button>' +
+        '</div>' +
+        '<div class="cwrap"><input type="number" inputmode="numeric" min="0" step="10000" placeholder="금액"><span>원</span></div>' +
+      '</article>';
+    }).join("");
+
+    grid.addEventListener("click", function(e){
+      const tierBtn = e.target.closest(".tiers button");
+      const card = e.target.closest(".item");
+      if(!card) return;
+      const id = card.dataset.id;
+      if(tierBtn){
+        e.stopPropagation();
+        const tier = tierBtn.dataset.tier;
+        if(!STATE.sel[id]) STATE.sel[id] = { tier: tier, custom: 0 };
+        else STATE.sel[id].tier = tier;
+        syncAll();
+        return;
+      }
+      if(e.target.closest(".cwrap")) return; // 직접입력 영역 클릭은 무시
+      toggleItem(id);
+    });
+
+    grid.addEventListener("keydown", function(e){
+      if(e.key !== "Enter" && e.key !== " ") return;
+      const card = e.target.closest(".item");
+      if(!card || e.target !== card) return;
+      e.preventDefault();
+      toggleItem(card.dataset.id);
+    });
+
+    grid.addEventListener("input", function(e){
+      const input = e.target.closest(".cwrap input");
+      if(!input) return;
+      const card = input.closest(".item");
+      const id = card.dataset.id;
+      const val = Math.max(0, Number(input.value) || 0);
+      if(!STATE.sel[id]) STATE.sel[id] = { tier:"custom", custom:val };
+      STATE.sel[id].tier = "custom";
+      STATE.sel[id].custom = val;
+      syncAll(true);
+    });
+  }
+
+  function toggleItem(id){
+    if(STATE.sel[id]) delete STATE.sel[id];
+    else STATE.sel[id] = { tier:"premium", custom:0 };
+    syncAll();
+  }
+
+  function itemPrice(id){
+    const it = CATALOG.find(function(c){ return c.id === id; });
+    const s = STATE.sel[id];
+    if(!it || !s) return null;
+    if(s.tier === "custom"){
+      const list = Math.max(0, Number(s.custom) || 0);
+      return { model:"직접입력", label:"직접", list:list, base:r10(list*0.90) };
+    }
+    const t = it.tiers[s.tier] || it.tiers.premium;
+    return { model:t.model, label:t.label, list:t.list, base:r10(t.list*t.rate) };
+  }
+
+  function syncCatalog(){
+    const cards = $("grid").querySelectorAll(".item");
+    Array.prototype.forEach.call(cards, function(card){
+      const id = card.dataset.id;
+      const s = STATE.sel[id];
+      const p = s ? itemPrice(id) : null;
+      card.classList.toggle("sel", !!s);
+      card.setAttribute("aria-pressed", s ? "true" : "false");
+      card.querySelector(".pick").textContent = s ? "✓" : "+";
+
+      const it = CATALOG.find(function(c){ return c.id === id; });
+      const pList = card.querySelector('[data-role="list"]');
+      const pNow = card.querySelector('[data-role="now"]');
+      if(s && p){
+        pList.textContent = "정상가 " + fmt(p.list) + "원";
+        pNow.textContent = fmt(p.base) + "원";
+        pList.style.display = "block";
+        card.querySelector(".sub").textContent = p.label === "직접" ? "직접입력 금액" : p.model;
+      }else{
+        pList.style.display = "none";
+        pNow.textContent = "정상가 " + shortWon(it.tiers.premium.list) + "원~";
+        card.querySelector(".sub").textContent = it.sub;
+      }
+      const tiers = card.querySelectorAll(".tiers button");
+      Array.prototype.forEach.call(tiers, function(b){
+        b.classList.toggle("on", !!s && s.tier === b.dataset.tier);
+      });
+      const cw = card.querySelector(".cwrap");
+      const inp = cw.querySelector("input");
+      if(s && s.tier === "custom"){
+        cw.classList.add("show");
+        if(document.activeElement !== inp) inp.value = s.custom ? String(s.custom) : "";
+      }else{
+        cw.classList.remove("show");
+      }
+    });
+  }
+
+  /* ── 계산 ─────────────────────────────── */
+  function calc(){
+    const ids = Object.keys(STATE.sel).filter(function(id){ return itemPrice(id); });
+    const rows = ids.map(function(id){
+      const it = CATALOG.find(function(c){ return c.id === id; });
+      const p = itemPrice(id);
+      const online = r10(p.base * CONFIG.onlineFactor);
+      return { id:id, name:it.name, big:it.big, model:p.model, label:p.label,
+               list:p.list, base:p.base, online:online };
+    }).sort(function(a,b){ return b.list - a.list; });
+
+    const count = rows.length;
+    const listTotal = rows.reduce(function(s,r){ return s + r.list; }, 0);
+    const baseTotal = rows.reduce(function(s,r){ return s + r.base; }, 0);
+    const baseDiscount = listTotal - baseTotal;
+
+    const tier = BUNDLE.find(function(b){ return count >= b.min; }) || { min:0, rate:0, label:"단일 품목" };
+    const bundleRate = count >= 2 ? tier.rate : 0;
+    const bundleDiscount = r10(baseTotal * bundleRate);
+    const afterBundle = baseTotal - bundleDiscount;
+
+    const card = CARDS[STATE.card] || CARDS.none;
+    const cardRaw = r10(afterBundle * card.rate);
+    const cardDiscount = Math.min(cardRaw, card.cap || 0);
+    const afterCard = afterBundle - cardDiscount;
+
+    const gcDiscount = r10(afterCard * STATE.gc);
+    const payAmount = afterCard - gcDiscount;
+
+    const point = STATE.gifts ? r10(payAmount * CONFIG.pointRate) : 0;
+    const gift = STATE.gifts ? (CONFIG.giftBase + CONFIG.giftPerItem * count) : 0;
+    const feelExtra = point + gift;
+    const feelPrice = Math.max(0, payAmount - feelExtra);
+    const saved = listTotal - feelPrice;
+    const savedPct = listTotal > 0 ? (saved / listTotal) * 100 : 0;
+
+    const onlineSum = rows.reduce(function(s,r){ return s + r.online; }, 0);
+    const bigCount = rows.filter(function(r){ return r.big; }).length;
+    const haul = bigCount * CONFIG.haulPerBig;
+    const acInstall = rows.some(function(r){ return r.id === "air"; }) ? CONFIG.acInstall : 0;
+    const onlineExtra = haul + acInstall;
+    const onlineTotal = onlineSum + onlineExtra;
+
+    return { rows:rows, count:count, listTotal:listTotal, baseTotal:baseTotal,
+      baseDiscount:baseDiscount, tier:tier, bundleRate:bundleRate, bundleDiscount:bundleDiscount,
+      afterBundle:afterBundle, card:card, cardDiscount:cardDiscount, afterCard:afterCard,
+      gcDiscount:gcDiscount, payAmount:payAmount, point:point, gift:gift, feelExtra:feelExtra,
+      feelPrice:feelPrice, saved:saved, savedPct:savedPct,
+      onlineSum:onlineSum, bigCount:bigCount, haul:haul, acInstall:acInstall,
+      onlineExtra:onlineExtra, onlineTotal:onlineTotal };
+  }
+
+  /* ── 요약 렌더 ─────────────────────────── */
+  function renderHero(C){
+    $("hFinal").textContent = fmt(C.feelPrice);
+    $("hPct").textContent = Math.max(0, Math.round(C.savedPct)) + "% 절약";
+    $("hSave").textContent = fmt(C.saved) + "원 아끼는 중";
+    $("hList").textContent = shortWon(C.listTotal) + "원";
+    $("hPay").textContent = shortWon(C.payAmount) + "원";
+    $("hCount").textContent = C.count + "개";
+
+    const t = C.listTotal || 1;
+    $("barM1").style.width = Math.min(100, (C.baseDiscount / t) * 100) + "%";
+    $("barM2").style.width = Math.min(100, ((C.bundleDiscount + C.cardDiscount + C.gcDiscount) / t) * 100) + "%";
+    $("barM3").style.width = Math.min(100, (C.feelExtra / t) * 100) + "%";
+  }
+
+  function renderBundle(C){
+    const el = $("bundleText");
+    const lvl = $("bundleLvl");
+    if(C.count === 0){
+      el.innerHTML = '품목을 2개 이상 선택하면 <b>다품목 동시구매 할인</b>이 자동으로 붙습니다.';
+      lvl.textContent = "0품목";
+      return;
+    }
+    if(C.count === 1){
+      el.innerHTML = '한 품목만 선택되면 다품목 할인이 없습니다. <b>1개만 더 담으면 3%</b>부터 시작합니다.';
+      lvl.textContent = "1품목";
+      return;
+    }
+    const next = BUNDLE.filter(function(b){ return b.min > C.count; }).sort(function(a,b){ return a.min - b.min; })[0];
+    el.innerHTML = '<b>' + C.tier.label + '</b> 적용 중 · ' + fmt(C.bundleDiscount) + '원 할인' +
+      (next ? ' <span style="color:#8a97a9">(다음 ' + next.label + ')</span>' : ' <span style="color:#8a97a9">(최고 구간)</span>');
+    lvl.textContent = C.count + "품목";
+  }
+
+  /* ── 혜택 상태 ─────────────────────────── */
+  function syncBenefits(){
+    Array.prototype.forEach.call($("cardChips").children, function(b){
+      b.classList.toggle("on", b.dataset.card === STATE.card);
+    });
+    Array.prototype.forEach.call($("gcChips").children, function(b){
+      b.classList.toggle("on", Number(b.dataset.gc) === STATE.gc);
+    });
+    const sw = $("giftSw");
+    sw.classList.toggle("on", STATE.gifts);
+    sw.setAttribute("aria-pressed", STATE.gifts ? "true" : "false");
+  }
+
+  /* ── 상세 렌더 ─────────────────────────── */
+  function row(label, sub, value, opts){
+    opts = opts || {};
+    const cls = opts.cls || "";
+    const vcls = opts.vcls || "";
+    const bar = typeof opts.bar === "number"
+      ? '<div class="bar' + (opts.bar2 ? " b2" : "") + '"><i style="width:' + Math.min(100, Math.max(0, opts.bar)) + '%"></i></div>'
+      : "";
+    const vsuf = opts.suffix !== undefined ? opts.suffix : "원";
+    return '<div class="bdrow ' + cls + '">' +
+      '<div class="l"><b>' + label + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + bar + '</div>' +
+      '<div class="v num ' + vcls + '">' + value + vsuf + '</div>' +
+      '</div>';
+  }
+
+  function renderBreakdown(C){
+    const el = $("bd");
+    if(C.count === 0){
+      el.innerHTML = '<div class="empty">품목을 선택하면 정상가부터 체감가까지 단계별로 계산됩니다.</div>';
+      return;
+    }
+    const t = C.listTotal || 1;
+    let h = "";
+    h += row("정상가 합계", C.count + "개 품목 · 공개 출고가 기준", fmt(C.listTotal), { bar:100, bar2:true });
+    h += row("매장 기본 할인", "품목별 카드·매장 기본 할인가 적용", "-" + fmt(C.baseDiscount),
+             { vcls:"neg", bar:(C.baseDiscount/t)*100 });
+    h += row("다품목 동시구매 할인", C.count >= 2 ? (C.tier.label + " 추가 할인") : "2품목부터 적용",
+             C.bundleDiscount ? "-" + fmt(C.bundleDiscount) : "0", { vcls:"neg", bar:(C.bundleDiscount/t)*100 });
+    h += row("제휴카드 청구할인",
+             C.card.rate === 0 ? "카드 미적용" : (C.card.label + " · 한도 " + shortWon(C.card.cap) + "원" + (C.cardDiscount < r10(C.afterBundle*C.card.rate) ? " (한도 도달)" : "")),
+             C.cardDiscount ? "-" + fmt(C.cardDiscount) : "0", { vcls:"neg", bar:(C.cardDiscount/t)*100 });
+    h += row("상품권 구매 할인", STATE.gc === 0 ? "상품권 미적용" : "상품권 " + Math.round(STATE.gc*100) + "% 할인 구매분",
+             C.gcDiscount ? "-" + fmt(C.gcDiscount) : "0", { vcls:"neg", bar:(C.gcDiscount/t)*100 });
+    h += '<div class="bdrow total"><div class="l"><b>실결제 예정 금액</b><span>카드 승인·상품권 결제 합계</span></div>' +
+         '<div class="v num">' + fmt(C.payAmount) + '원</div></div>';
+    h += row("포인트 적립", STATE.gifts ? "멤버십 1% · 구매 적립" : "미포함",
+             C.point ? "-" + fmt(C.point) : "0", { vcls:"neg" });
+    h += row("사은품·설치 체감", STATE.gifts ? ("사은품 " + shortWon(CONFIG.giftBase) + " + 무상설치·폐가전 " + shortWon(CONFIG.giftPerItem*C.count) + "원") : "미포함",
+             C.gift ? "-" + fmt(C.gift) : "0", { vcls:"neg" });
+    h += '<div class="bdrow final"><div class="l"><b>최종 체감가</b><span>정상가 대비 ' + Math.round(C.savedPct) + '% · ' + fmt(C.saved) + '원 절약</span></div>' +
+         '<div class="v num">' + fmt(C.feelPrice) + '원</div></div>';
+    el.innerHTML = h;
+  }
+
+  /* ── 비교 렌더 ─────────────────────────── */
+  function renderCompare(C){
+    const box = $("cmp");
+    if(C.count === 0){
+      box.innerHTML = '<div class="empty" style="grid-column:1/-1">품목을 선택하면 온라인 단품가와 매장 다품목가를 비교합니다.</div>';
+      $("verdictText").textContent = "품목을 선택하면 이번 조합에 유리한 쪽을 계산해 드립니다.";
+      $("verdictReasons").innerHTML = "";
+      return;
+    }
+    const storeWin = C.feelPrice <= C.onlineTotal;
+    const gap = Math.abs(C.onlineTotal - C.feelPrice);
+
+    box.innerHTML =
+      '<div class="c' + (!storeWin ? " win" : "") + '">' +
+        (!storeWin ? '<span class="flag">이쪽이 유리</span>' : '') +
+        '<h4>온라인 단품 최저가</h4>' +
+        '<div class="who">품목별 따로 구매</div>' +
+        '<div class="amt num">' + fmt(C.onlineTotal) + '원</div>' +
+        '<ul>' +
+          '<li>단품 최저가 합 <b>' + fmt(C.onlineSum) + '원</b></li>' +
+          '<li>폐가전 수거 ' + C.bigCount + '대 <b>' + fmt(C.haul) + '원</b></li>' +
+          '<li>에어컨 설치 <b>' + (C.acInstall ? fmt(C.acInstall) + '원' : '0원') + '</b></li>' +
+          '<li>다품목 캐시백 <b>없음</b></li>' +
+          '<li>사은품·무상 A/S <b>품목별로 제각각</b></li>' +
+        '</ul>' +
+      '</div>' +
+      '<div class="c' + (storeWin ? " win" : "") + '">' +
+        (storeWin ? '<span class="flag">이쪽이 유리</span>' : '') +
+        '<h4>베스트샵 다품목</h4>' +
+        '<div class="who">한 번에 설치·수거</div>' +
+        '<div class="amt num">' + fmt(C.feelPrice) + '원</div>' +
+        '<ul>' +
+          '<li>정상가 <b>' + fmt(C.listTotal) + '원</b></li>' +
+          '<li>다품목 ' + C.count + '품목 <b>-' + fmt(C.bundleDiscount) + '원</b></li>' +
+          '<li>카드·상품권 <b>-' + fmt(C.cardDiscount + C.gcDiscount) + '원</b></li>' +
+          '<li>무상설치·폐가전 수거 <b>포함</b></li>' +
+          '<li>사은품 <b>' + shortWon(CONFIG.giftBase) + '원 상당</b></li>' +
+        '</ul>' +
+      '</div>';
+
+    $("verdictText").innerHTML = storeWin
+      ? '이번 조합은 <b>매장 다품목이 ' + fmt(gap) + '원 유리</b>합니다. 온라인 단품가에 설치·수거비를 더하면 차이가 줄고, 사은품까지 넣으면 역전됩니다.'
+      : '이번 조합은 <b>온라인 단품이 ' + fmt(gap) + '원 유리</b>합니다. 품목 수를 늘리면 다품목 할인 구간이 올라가 역전될 수 있습니다.';
+    const rs = [];
+    if(C.bundleDiscount > 0) rs.push("다품목 " + Math.round(C.bundleRate*100) + "%");
+    if(C.cardDiscount > 0) rs.push("카드 " + fmt(C.cardDiscount) + "원");
+    if(C.gcDiscount > 0) rs.push("상품권 " + Math.round(STATE.gc*100) + "%");
+    if(C.gift > 0) rs.push("사은품·설치");
+    rs.push("폐가전 수거 포함");
+    $("verdictReasons").innerHTML = rs.map(function(r){ return "<span>" + r + "</span>"; }).join("");
+  }
+
+  function renderDock(C){
+    $("dFinal").textContent = fmt(C.feelPrice);
+    $("dPct").textContent = C.count ? Math.round(C.savedPct) + "%↓" : "";
+  }
+
+  function syncAll(fromInput){
+    syncCatalog();
+    if(!fromInput) syncBenefits();
+    const C = calc();
+    renderHero(C);
+    renderBundle(C);
+    renderBreakdown(C);
+    renderCompare(C);
+    renderDock(C);
+    syncCardLabels(C);
+    return C;
+  }
+
+  function syncCardLabels(C){
+    const cardSave = C.cardDiscount;
+    $("cardNow").textContent = cardSave ? "-" + shortWon(cardSave) + "원" : "미적용";
+    $("gcNow").textContent = C.gcDiscount ? "-" + shortWon(C.gcDiscount) + "원" : "미적용";
+    const extra = C.point + C.gift;
+    $("giftNow").textContent = extra ? "-" + shortWon(extra) + "원" : "미포함";
+  }
+
+  /* ── 견적서 텍스트 ─────────────────────── */
+  function buildQuote(){
+    const C = calc();
+    const budget = $("fBudget").value;
+    const when = $("fWhen").value;
+    const region = $("fRegion").value.trim();
+    const lines = [];
+    lines.push("[가전 조합 견적 요청]");
+    if(budget) lines.push("· 예산: " + budget);
+    if(when) lines.push("· 입주/결혼 시기: " + when);
+    if(region) lines.push("· 설치 지역: " + region);
+    lines.push("");
+    if(C.count === 0){
+      lines.push("▸ 아직 품목을 고르지 않았습니다. 상담에서 함께 정하고 싶습니다.");
+    }else{
+      lines.push("▸ 희망 조합 (" + C.count + "품목)");
+      C.rows.forEach(function(r, i){
+        lines.push(String(i+1) + ". " + r.name + " · " + r.label + " · " + r.model + " — 정상가 " + fmt(r.list) + "원");
+      });
+      lines.push("");
+      lines.push("▸ 가격 계산");
+      lines.push("정상가 합계 " + fmt(C.listTotal) + "원");
+      lines.push("기본 할인 -" + fmt(C.baseDiscount) + "원");
+      lines.push("다품목 동시구매 할인(" + C.count + "품목 " + Math.round(C.bundleRate*100) + "%) -" + fmt(C.bundleDiscount) + "원");
+      lines.push("제휴카드 청구할인(" + C.card.label + ") -" + fmt(C.cardDiscount) + "원");
+      lines.push("상품권 구매 할인(" + Math.round(STATE.gc*100) + "%) -" + fmt(C.gcDiscount) + "원");
+      lines.push("= 실결제 예정 " + fmt(C.payAmount) + "원");
+      if(C.feelExtra > 0) lines.push("포인트·사은품 체감 -" + fmt(C.feelExtra) + "원");
+      lines.push("= 최종 체감가 " + fmt(C.feelPrice) + "원 (정상가 대비 " + Math.round(C.savedPct) + "% 절약)");
+      lines.push("");
+      lines.push("▸ 비교: 온라인 단품 약 " + fmt(C.onlineTotal) + "원 / 매장 다품목 " + fmt(C.feelPrice) + "원");
+    }
+    lines.push("");
+    lines.push(CONFIG.managerLabel + " @" + "sond__b");
+    return lines.join("\n");
+  }
+
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+
+  function copyQuote(){
+    const text = buildQuote();
+    const done = function(){ toast("견적서 복사 완료 · 상담에 붙여넣으세요"); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ legacyCopy(text, done); });
+    }else{
+      legacyCopy(text, done);
+    }
+  }
+
+  function legacyCopy(text, done){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    if(ok) done();
+    else toast("복사가 막혔습니다 · 아래 상담 버튼을 눌러주세요");
+  }
+
+  /* ── 이벤트 ───────────────────────────── */
+  function bind(){
+    $("presets").addEventListener("click", function(e){
+      const b = e.target.closest("button");
+      if(!b) return;
+      const key = b.dataset.preset;
+      if(key === "clear"){
+        STATE.sel = {};
+      }else if(PRESETS[key]){
+        STATE.sel = {};
+        Object.keys(PRESETS[key]).forEach(function(id){
+          STATE.sel[id] = { tier: PRESETS[key][id], custom:0 };
+        });
+      }
+      Array.prototype.forEach.call($("presets").children, function(x){
+        x.classList.toggle("on", x === b && key !== "clear");
+      });
+      syncAll();
+      toast(key === "clear" ? "선택을 비웠습니다" : "조합을 불러왔습니다");
+    });
+
+    $("cardChips").addEventListener("click", function(e){
+      const b = e.target.closest("button");
+      if(!b) return;
+      STATE.card = b.dataset.card;
+      syncAll();
+    });
+
+    $("gcChips").addEventListener("click", function(e){
+      const b = e.target.closest("button");
+      if(!b) return;
+      STATE.gc = Number(b.dataset.gc);
+      syncAll();
+    });
+
+    $("giftSw").addEventListener("click", function(){
+      STATE.gifts = !STATE.gifts;
+      syncAll();
+    });
+
+    $("copyBtn").addEventListener("click", copyQuote);
+    $("dockGo").addEventListener("click", copyQuote);
+    $("dockGo").addEventListener("click", function(){
+      const q = $("quote");
+      if(q && q.getBoundingClientRect().top > window.innerHeight * 0.6){
+        q.scrollIntoView({ behavior:"smooth", block:"start" });
+      }
+    });
+
+    $("kakaoBtn").href = CONFIG.kakaoOpenChatUrl;
+    $("threadsBtn").href = CONFIG.threadsUrl;
+
+    // 입주·결혼 시기: 이번 달부터 18개월
+    (function fillMonths(){
+      const sel = $("fWhen");
+      const now = new Date();
+      for(let i=0;i<18;i++){
+        const d = new Date(now.getFullYear(), now.getMonth()+i, 1);
+        const y = d.getFullYear();
+        const m = d.getMonth()+1;
+        const opt = document.createElement("option");
+        opt.value = y + "년 " + m + "월";
+        opt.textContent = y + "년 " + m + "월" + (i === 0 ? " (이번 달)" : "");
+        sel.appendChild(opt);
+      }
+    })();
+
+    ["fBudget","fWhen","fRegion"].forEach(function(id){
+      $(id).addEventListener("change", function(){ /* 값은 복사 시점에 반영 */ });
+    });
+  }
+
+  /* ── 시작 ─────────────────────────────── */
+  buildGrid();
+  bind();
+  STATE.sel = {};
+  Object.keys(PRESETS.move).forEach(function(id){
+    STATE.sel[id] = { tier: PRESETS.move[id], custom:0 };
+  });
+  const mv = document.querySelector('#presets button[data-preset="move"]');
+  if(mv) mv.classList.add("on");
+  syncAll();
+})();
+</script>
+</body>
+</html>
