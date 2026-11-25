@@ -1,7 +1,8 @@
-# 가전 조합·체감가 계산 웹앱 (미리보기)
+# 가전 조합·체감가 계산 웹앱
 
 `index.html` 단일 파일 (외부 의존성 0). 390px 모바일 기준 + PC 반응형.
-아직 배포하지 않았습니다. 성훈님 미리보기 확인 후 GitHub Pages 배포 여부 결정.
+
+**배포 주소**: https://acesond.github.io/Sond-appliance-app/ (GitHub Pages, `main` / root — `main`에 푸시하면 자동 반영)
 
 ## 배포 전 바꿀 곳
 
