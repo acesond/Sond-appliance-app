@@ -178,6 +178,16 @@ body{
 }
 .item .cwrap input:focus{outline:none; border-color:var(--em); box-shadow:0 0 0 2px rgba(14,159,110,.15)}
 .item .cwrap span{font-size:10.5px; color:var(--dim)}
+.item .mwrap{display:none; margin-top:6px}
+.item.sel .mwrap{display:block}
+.item .mwrap input{
+  width:100%; min-width:0; font:inherit; font-size:10.5px; font-weight:650; letter-spacing:-.2px;
+  padding:5px 7px; border-radius:7px; border:1px dashed var(--em-line); background:#fff; color:var(--ink);
+  -webkit-appearance:none; appearance:none; text-overflow:ellipsis;
+}
+.item .mwrap input::placeholder{font-size:9.5px; font-weight:500; color:var(--dim2); letter-spacing:-.3px; opacity:1; text-overflow:ellipsis}
+.item .mwrap input:focus{outline:none; border-style:solid; border-color:var(--em); box-shadow:0 0 0 2px rgba(14,159,110,.15)}
+.item .mwrap input.filled{border-style:solid; background:#fbfefd; color:var(--em-d)}
 .item .badge7{
   position:absolute; left:11px; bottom:11px; font-size:9px; font-weight:700;
   color:var(--em-d); background:var(--em-soft); border-radius:6px; padding:2px 5px;
@@ -614,6 +624,7 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
 
   const STATE = {
     sel:{},
+    models:{},   /* 품목 id → 직접 적은 모델명 (선택을 해제해도 보관) */
     card:"c5",
     gc:0.05,
     gifts:true
@@ -658,10 +669,12 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
           '<button type="button" data-tier="custom">직접</button>' +
         '</div>' +
         '<div class="cwrap"><input type="number" inputmode="numeric" min="0" step="10000" placeholder="금액"><span>원</span></div>' +
+        '<div class="mwrap"><input type="text" data-role="model" maxlength="40" autocomplete="off" enterkeyhint="done" placeholder="모델명 입력 (예: OLED65C4)" aria-label="모델명 입력 (선택)"></div>' +
       '</article>';
     }).join("");
 
     grid.addEventListener("click", function(e){
+      if(e.target.closest(".mwrap")){ e.stopPropagation(); return; } // 모델명 입력칸 클릭은 카드 토글과 분리
       const tierBtn = e.target.closest(".tiers button");
       const card = e.target.closest(".item");
       if(!card) return;
@@ -686,7 +699,27 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
       toggleItem(card.dataset.id);
     });
 
+    // 모델명 입력: 이벤트가 카드까지 올라가 품목이 풀리지 않도록 끊고, 값은 STATE에 보관
+    Array.prototype.forEach.call(grid.querySelectorAll(".mwrap"), function(w){
+      ["click","pointerdown","touchstart"].forEach(function(type){
+        w.addEventListener(type, function(e){ e.stopPropagation(); }, { passive: type !== "click" });
+      });
+      w.addEventListener("keydown", function(e){
+        if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); e.target.blur(); }
+      });
+    });
+
     grid.addEventListener("input", function(e){
+      const mi = e.target.closest(".mwrap input");
+      if(mi){
+        const card = mi.closest(".item");
+        const id = card.dataset.id;
+        const v = mi.value;
+        if(v.trim()) STATE.models[id] = v; else delete STATE.models[id];
+        mi.classList.toggle("filled", !!v.trim());
+        paintSub(card);
+        return;
+      }
       const input = e.target.closest(".cwrap input");
       if(!input) return;
       const card = input.closest(".item");
@@ -734,16 +767,21 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
         pList.textContent = "정상가 " + fmt(p.list) + "원";
         pNow.textContent = fmt(p.base) + "원";
         pList.style.display = "block";
-        card.querySelector(".sub").textContent = p.label === "직접" ? "직접입력 금액" : p.model;
       }else{
         pList.style.display = "none";
         pNow.textContent = "정상가 " + shortWon(it.tiers.premium.list) + "원~";
-        card.querySelector(".sub").textContent = it.sub;
       }
+      paintSub(card);
       const tiers = card.querySelectorAll(".tiers button");
       Array.prototype.forEach.call(tiers, function(b){
         b.classList.toggle("on", !!s && s.tier === b.dataset.tier);
       });
+      const mi = card.querySelector(".mwrap input");
+      if(mi){
+        const typed = STATE.models[id] || "";
+        if(document.activeElement !== mi && mi.value !== typed) mi.value = typed;
+        mi.classList.toggle("filled", !!typed.trim());
+      }
       const cw = card.querySelector(".cwrap");
       const inp = cw.querySelector("input");
       if(s && s.tier === "custom"){
@@ -755,6 +793,20 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
     });
   }
 
+  /* 선택된 카드의 부제: 가격 기준이 되는 등급 모델명 */
+  function paintSub(card){
+    const id = card.dataset.id;
+    const s = STATE.sel[id];
+    const it = CATALOG.find(function(c){ return c.id === id; });
+    const p = s ? itemPrice(id) : null;
+    const sub = card.querySelector(".sub");
+    if(s && p){
+      sub.textContent = p.label === "직접" ? "직접입력 금액" : p.model;
+    }else{
+      sub.textContent = it.sub;
+    }
+  }
+
   /* ── 계산 ─────────────────────────────── */
   function calc(){
     const ids = Object.keys(STATE.sel).filter(function(id){ return itemPrice(id); });
@@ -763,6 +815,7 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
       const p = itemPrice(id);
       const online = r10(p.base * CONFIG.onlineFactor);
       return { id:id, name:it.name, big:it.big, model:p.model, label:p.label,
+               modelUser:(STATE.models[id] || "").trim(),
                list:p.list, base:p.base, online:online };
     }).sort(function(a,b){ return b.list - a.list; });
 
@@ -977,6 +1030,14 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
   }
 
   /* ── 견적서 텍스트 ─────────────────────── */
+  /* 입력한 모델명이 있으면 그걸 쓰고, 가격 기준이 된 추천 모델이 다르면 함께 적습니다 */
+  function modelText(r){
+    const typed = r.modelUser || "";
+    if(!typed) return r.model;
+    if(r.label === "직접" || typed === r.model) return typed;
+    return typed + " (가격 기준 " + r.model + ")";
+  }
+
   function buildQuote(){
     const C = calc();
     const budget = $("fBudget").value;
@@ -993,7 +1054,7 @@ details.help div{font-size:10.5px; color:var(--dim); line-height:1.7; letter-spa
     }else{
       lines.push("▸ 희망 조합 (" + C.count + "품목)");
       C.rows.forEach(function(r, i){
-        lines.push(String(i+1) + ". " + r.name + " · " + r.label + " · " + r.model + " — 정상가 " + fmt(r.list) + "원");
+        lines.push(String(i+1) + ". " + r.name + " · " + r.label + " · " + modelText(r) + " — 정상가 " + fmt(r.list) + "원");
       });
       lines.push("");
       lines.push("▸ 가격 계산");
